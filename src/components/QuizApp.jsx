@@ -113,17 +113,17 @@ const QuizApp = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-4 flex justify-center items-center font-sans" dir="rtl">
+    <div className="bg-gradient-to-br from-[#5D8C48] to-[#254942] min-h-screen p-4 flex justify-center items-center font-sans" dir="rtl">
       <div className="w-full max-w-2xl mx-auto">
         {!showScore ? (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg shadow-lg p-6 md:p-8"
+            className="bg-[#254942] rounded-lg shadow-lg p-6 md:p-8 text-[#E7E4DF]"
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800">اختبار الأمن والخصوصية</h2>
-              <div className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+              <h2 className="text-xl font-bold text-[#E7E4DF]">اختبار الأمن والخصوصية</h2>
+              <div className="bg-[#857249] text-[#E7E4DF] px-3 py-1 rounded-full text-sm font-medium">
                 السؤال {currentQuestion + 1} من {questions.length}
               </div>
             </div>
@@ -135,7 +135,7 @@ const QuizApp = () => {
               transition={{ duration: 0.5 }}
               className="mb-6"
             >
-              <h3 className="text-lg font-bold text-gray-700 mb-4">
+              <h3 className="text-lg font-bold text-[#E7E4DF] mb-4">
                 {questions[currentQuestion].questionText}
               </h3>
               
@@ -149,22 +149,22 @@ const QuizApp = () => {
                     className={`p-4 rounded-lg cursor-pointer border-2 transition-all duration-200 ${
                       selectedAnswer === index
                         ? index === questions[currentQuestion].correctAnswer
-                          ? 'bg-green-100 border-green-500'
-                          : 'bg-red-100 border-red-500'
-                        : 'bg-gray-50 border-gray-200 hover:border-indigo-300'
+                          ? 'bg-[#5D8C48] border-[#E7E4DF]'
+                          : 'bg-[#857249] border-[#E7E4DF]'
+                        : 'bg-[#254942] border-[#857249] hover:border-[#E7E4DF]'
                     }`}
                   >
                     <div className="flex items-center">
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
                         selectedAnswer === index
                           ? index === questions[currentQuestion].correctAnswer
-                            ? 'bg-green-500 text-white'
-                            : 'bg-red-500 text-white'
-                          : 'bg-gray-200 text-gray-700'
+                            ? 'bg-[#5D8C48] text-[#E7E4DF]'
+                            : 'bg-[#857249] text-[#E7E4DF]'
+                          : 'bg-[#857249] text-[#E7E4DF]'
                       }`}>
                         {index + 1}
                       </div>
-                      <span className="text-gray-800">{option}</span>
+                      <span className="text-[#E7E4DF]">{option}</span>
                     </div>
                   </motion.div>
                 ))}
@@ -175,16 +175,16 @@ const QuizApp = () => {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded"
+                className="bg-[#857249] border-l-4 border-[#E7E4DF] p-4 mb-6 rounded"
               >
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="h-5 w-5 text-[#E7E4DF]" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div className="mr-3">
-                    <p className="text-sm text-amber-700">
+                    <p className="text-sm text-[#E7E4DF]">
                       الإجابة الصحيحة هي: {questions[currentQuestion].options[questions[currentQuestion].correctAnswer]}
                     </p>
                   </div>
@@ -200,8 +200,8 @@ const QuizApp = () => {
                 onClick={handleNextQuestion}
                 className={`px-6 py-3 rounded-full font-medium ${
                   answered
-                    ? 'bg-indigo-600 text-white shadow-md hover:bg-indigo-700'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? 'bg-[#857249] text-[#E7E4DF] shadow-md hover:bg-[#5D8C48]'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 }`}
               >
                 {currentQuestion === questions.length - 1 ? 'إنهاء الاختبار' : 'السؤال التالي'}
@@ -212,21 +212,21 @@ const QuizApp = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg shadow-lg p-8 text-center"
+            className="bg-[#254942] rounded-lg shadow-lg p-8 text-center text-[#E7E4DF]"
           >
             <div className="mb-6">
               <motion.div 
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="w-24 h-24 rounded-full bg-indigo-100 mx-auto flex items-center justify-center"
+                className="w-24 h-24 rounded-full bg-[#857249] mx-auto flex items-center justify-center"
               >
-                <span className="text-3xl font-bold text-indigo-600">{score}</span>
+                <span className="text-3xl font-bold text-[#E7E4DF]">{score}</span>
               </motion.div>
             </div>
             
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">اكتمل الاختبار!</h2>
-            <p className="text-gray-600 mb-6">حصلت على {score} من أصل {questions.length * 2} نقاط</p>
+            <h2 className="text-2xl font-bold text-[#E7E4DF] mb-2">اكتمل الاختبار!</h2>
+            <p className="text-[#E7E4DF] mb-6">حصلت على {score} من أصل {questions.length * 2} نقاط</p>
             
             <motion.div
               initial={{ opacity: 0 }}
@@ -234,21 +234,21 @@ const QuizApp = () => {
               transition={{ delay: 0.5 }}
             >
               {score >= (questions.length * 2 * 0.8) ? (
-                <div className="text-green-600 mb-6">
+                <div className="text-[#E7E4DF] mb-6">
                   <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <p className="font-medium">أحسنت! لديك فهم ممتاز لسياسات الأمن والخصوصية.</p>
                 </div>
               ) : score >= (questions.length * 2 * 0.6) ? (
-                <div className="text-amber-600 mb-6">
+                <div className="text-[#E7E4DF] mb-6">
                   <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-5a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm1-9a1 1 0 00-1 1v4a1 1 0 102 0V5a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   <p className="font-medium">جيد! يمكنك تحسين معرفتك بسياسات الأمن والخصوصية.</p>
                 </div>
               ) : (
-                <div className="text-red-600 mb-6">
+                <div className="text-[#E7E4DF] mb-6">
                   <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
@@ -261,7 +261,7 @@ const QuizApp = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={restartQuiz}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-full font-medium shadow-md hover:bg-indigo-700"
+              className="px-6 py-3 bg-[#857249] text-[#E7E4DF] rounded-full font-medium shadow-md hover:bg-[#5D8C48]"
             >
               إعادة الاختبار
             </motion.button>
