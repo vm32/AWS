@@ -1,275 +1,397 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { Check, Shield, Info, User, Github, Mail, Linkedin } from 'lucide-react';
 
-const QuizApp = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
-  const [showScore, setShowScore] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [answered, setAnswered] = useState(false);
+// AWS Security Checklist data structure
+const securitySections = [
+  {
+    id: 'iam',
+    title: 'Identity and Access Management (IAM)',
+    items: [
+      { id: 'iam-1', text: 'Multi-Factor Authentication (MFA) enabled for all users' },
+      { id: 'iam-2', text: 'Least privilege principle implemented for all IAM roles and policies' },
+      { id: 'iam-3', text: 'Regular audit of IAM policies and permissions' },
+      { id: 'iam-4', text: 'Password policy enforces strong passwords' },
+      { id: 'iam-5', text: 'Root account secured with hardware MFA' },
+      { id: 'iam-6', text: 'IAM Access Analyzer implemented' },
+      { id: 'iam-7', text: 'IAM roles used instead of long-term access keys' },
+      { id: 'iam-8', text: 'Regular rotation of access keys' }
+    ]
+  },
+  {
+    id: 'network',
+    title: 'Network Security',
+    items: [
+      { id: 'net-1', text: 'VPC flow logs enabled' },
+      { id: 'net-2', text: 'Security groups restrict access to necessary ports only' },
+      { id: 'net-3', text: 'Network ACLs configured as additional security layer' },
+      { id: 'net-4', text: 'Public subnets minimized and properly secured' },
+      { id: 'net-5', text: 'AWS Shield activated for DDoS protection' },
+      { id: 'net-6', text: 'VPC endpoints used for AWS services' },
+      { id: 'net-7', text: 'Transit Gateway configured with proper routing controls' }
+    ]
+  },
+  {
+    id: 'data',
+    title: 'Data Protection',
+    items: [
+      { id: 'data-1', text: 'S3 buckets have proper access controls' },
+      { id: 'data-2', text: 'S3 bucket public access blocked at account level' },
+      { id: 'data-3', text: 'EBS volumes encrypted' },
+      { id: 'data-4', text: 'RDS instances encrypted' },
+      { id: 'data-5', text: 'Data classification strategy implemented' },
+      { id: 'data-6', text: 'S3 versioning enabled for critical buckets' },
+      { id: 'data-7', text: 'Secrets stored in AWS Secrets Manager or Parameter Store' },
+      { id: 'data-8', text: 'KMS used for key management' }
+    ]
+  },
+  {
+    id: 'logging',
+    title: 'Logging and Monitoring',
+    items: [
+      { id: 'log-1', text: 'CloudTrail enabled in all regions' },
+      { id: 'log-2', text: 'CloudTrail logs encrypted and with integrity validation' },
+      { id: 'log-3', text: 'CloudWatch alarms for suspicious activity' },
+      { id: 'log-4', text: 'AWS Config enabled for resource configuration tracking' },
+      { id: 'log-5', text: 'GuardDuty enabled for threat detection' },
+      { id: 'log-6', text: 'Log centralization strategy implemented' },
+      { id: 'log-7', text: 'Security Hub enabled for comprehensive security view' }
+    ]
+  },
+  {
+    id: 'compliance',
+    title: 'Compliance and Governance',
+    items: [
+      { id: 'comp-1', text: 'Regular security assessments performed' },
+      { id: 'comp-2', text: 'Well-defined security incident response process' },
+      { id: 'comp-3', text: 'AWS Organizations used for multi-account management' },
+      { id: 'comp-4', text: 'Service Control Policies (SCPs) implemented' },
+      { id: 'comp-5', text: 'Compliance frameworks identified and implemented' },
+      { id: 'comp-6', text: 'Regular backup and recovery testing' }
+    ]
+  },
+  {
+    id: 'compute',
+    title: 'Compute Security',
+    items: [
+      { id: 'comp-1', text: 'EC2 instances patched regularly' },
+      { id: 'comp-2', text: 'IMDSv2 required on all EC2 instances' },
+      { id: 'comp-3', text: 'Lambda functions follow least privilege' },
+      { id: 'comp-4', text: 'Container images scanned for vulnerabilities' },
+      { id: 'comp-5', text: 'Auto scaling configured for resilience' },
+      { id: 'comp-6', text: 'ECS/EKS clusters secured properly' }
+    ]
+  }
+];
 
-  const questions = [
-    {
-      id: 1,
-      questionText: 'من الممارسات الصحيحة لتبادل مستندات العمل:',
-      options: [
-        'إرسالها عبر البريد الشخصي أو تطبيقات التواصل',
-        'تسليمها يدويًا فقط',
-        'استخدام القنوات الرسمية المعتمدة في الوزارة',
-        'إرسالها في مجموعة العمل على تطبيق الواتساب'
-      ],
-      correctAnswer: 2
-    },
-    {
-      id: 2,
-      questionText: 'ماهي القنوات المعتمدة لمشاركة الملفات في الوزارة:',
-      options: [
-        'شارك',
-        'البريد الالكتروني الرسمي',
-        'نظام الاتصالات الإدارية لمشاركة الخطابات',
-        'جميع ما سبق'
-      ],
-      correctAnswer: 3
-    },
-    {
-      id: 3,
-      questionText: 'ما هو الخطر الأساسي من إرسال ملفات حساسة عبر برامج التواصل الاجتماعي مثل الواتس اب؟',
-      options: [
-        'سرعة الإرسال الزائدة',
-        'احتمال فقدان الجوال فقط',
-        'تعرض البيانات للتسريب أو الاختراق',
-        'امتلاء ذاكرة الهاتف'
-      ],
-      correctAnswer: 2
-    },
-    {
-      id: 4,
-      questionText: 'ما هي العقوبة في حال قام الموظف بتسريب بيانات الوزارة ؟',
-      options: [
-        'تنبيه ولفت نظر فقط',
-        'لا توجد أي عقوبة',
-        'السجن لمدة لا تزيد عن 20 عام او غرامة لا تزيد عن مليون ريال سعودي او كلاهما',
-        'خصم راتب'
-      ],
-      correctAnswer: 2
-    },
-    {
-      id: 5,
-      questionText: 'ما لمقصود بتقنية التزييف العميق (Deepfake)؟',
-      options: [
-        'نوع من الذكاء الاصطناعي مصمم لأتمتة المهام',
-        'تقنية وسائط رقمية تستخدم الذكاء الاصطناعي لإنشاء مقاطع فيديو أو تسجيلات صوتية مزيفة تبدو واقعية',
-        'بروتوكول أمان لحماية المعلومات الرقمية',
-        'معيار صناعي لضغط الفيديو'
-      ],
-      correctAnswer: 1
-    },
-    {
-      id: 6,
-      questionText: 'ماهي المخاطر الرئيسية المرتبطة بتكنولوجيا التزييف العميق؟',
-      options: [
-        'زيادة جودة الفيديو',
-        'تحسين تجربة المستخدم في الوسائط الرقمية',
-        'إمكانية التضليل والتلاعب بالرأي العام',
-        'تحسين دقة التعرف على الوجه'
-      ],
-      correctAnswer: 2
-    }
-  ];
-
-  const handleAnswerClick = (answerIndex) => {
-    if (answered) return;
+// Recommendations based on score ranges
+const getRecommendations = (sectionScores) => {
+  const recommendations = [];
+  
+  Object.entries(sectionScores).forEach(([sectionId, score]) => {
+    const section = securitySections.find(s => s.id === sectionId);
+    if (!section) return;
     
-    setSelectedAnswer(answerIndex);
-    setAnswered(true);
+    const percentage = score.score / score.total * 100;
     
-    if (answerIndex === questions[currentQuestion].correctAnswer) {
-      setScore(score + 2);
-    } else {
-      setShowFeedback(true);
+    if (percentage < 50) {
+      recommendations.push({
+        section: section.title,
+        severity: 'high',
+        message: `Critical: Your ${section.title} setup needs immediate attention. Consider implementing all missing controls as soon as possible.`
+      });
+    } else if (percentage < 75) {
+      recommendations.push({
+        section: section.title,
+        severity: 'medium',
+        message: `Warning: Your ${section.title} has some gaps. Review and address the unchecked items to improve security posture.`
+      });
+    } else if (percentage < 100) {
+      recommendations.push({
+        section: section.title,
+        severity: 'low',
+        message: `Good: Your ${section.title} is well configured but could be improved by addressing the remaining items.`
+      });
     }
+  });
+  
+  return recommendations;
+};
+
+// Main component
+const App = () => {
+  const [currentPage, setCurrentPage] = useState('checklist');
+  const [checkedItems, setCheckedItems] = useState({});
+  const [sectionsExpanded, setSectionsExpanded] = useState({});
+  const [sectionScores, setSectionScores] = useState({});
+  const [totalScore, setTotalScore] = useState({ score: 0, total: 0 });
+  
+  // Initialize expanded sections
+  useEffect(() => {
+    const initialExpandedState = {};
+    securitySections.forEach(section => {
+      initialExpandedState[section.id] = true;
+    });
+    setSectionsExpanded(initialExpandedState);
+  }, []);
+  
+  // Calculate scores when checked items change
+  useEffect(() => {
+    const newSectionScores = {};
+    let totalChecked = 0;
+    let totalItems = 0;
+    
+    securitySections.forEach(section => {
+      const sectionChecked = section.items.filter(item => checkedItems[item.id]).length;
+      const sectionTotal = section.items.length;
+      
+      newSectionScores[section.id] = {
+        score: sectionChecked,
+        total: sectionTotal
+      };
+      
+      totalChecked += sectionChecked;
+      totalItems += sectionTotal;
+    });
+    
+    setSectionScores(newSectionScores);
+    setTotalScore({ score: totalChecked, total: totalItems });
+  }, [checkedItems]);
+  
+  // Handle item check/uncheck
+  const handleItemCheck = (itemId) => {
+    setCheckedItems(prev => ({
+      ...prev,
+      [itemId]: !prev[itemId]
+    }));
+  };
+  
+  // Toggle section expansion
+  const toggleSectionExpand = (sectionId) => {
+    setSectionsExpanded(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
+  
+  // Calculate percentage for progress bars
+  const calculatePercentage = (score, total) => {
+    return (score / total) * 100;
+  };
+  
+  // Get color based on percentage
+  const getColorByPercentage = (percentage) => {
+    if (percentage < 50) return 'bg-red-500';
+    if (percentage < 75) return 'bg-yellow-500';
+    return 'bg-green-500';
   };
 
-  const handleNextQuestion = () => {
-    setSelectedAnswer(null);
-    setShowFeedback(false);
-    setAnswered(false);
-    
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      setShowScore(true);
-    }
-  };
-
-  const restartQuiz = () => {
-    setCurrentQuestion(0);
-    setScore(0);
-    setShowScore(false);
-    setSelectedAnswer(null);
-    setShowFeedback(false);
-    setAnswered(false);
-  };
-
-  return (
-    <div className="bg-gradient-to-br from-[#5D8C48] to-[#254942] min-h-screen p-4 flex justify-center items-center font-sans" dir="rtl">
-      <div className="w-full max-w-2xl mx-auto">
-        {!showScore ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-[#254942] rounded-lg shadow-lg p-6 md:p-8 text-[#E7E4DF]"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-[#E7E4DF]">اختبار الأمن والخصوصية</h2>
-              <div className="bg-[#857249] text-[#E7E4DF] px-3 py-1 rounded-full text-sm font-medium">
-                السؤال {currentQuestion + 1} من {questions.length}
-              </div>
-            </div>
-            
-            <motion.div 
-              key={currentQuestion}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="mb-6"
-            >
-              <h3 className="text-lg font-bold text-[#E7E4DF] mb-4">
-                {questions[currentQuestion].questionText}
-              </h3>
-              
-              <div className="space-y-3">
-                {questions[currentQuestion].options.map((option, index) => (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleAnswerClick(index)}
-                    className={`p-4 rounded-lg cursor-pointer border-2 transition-all duration-200 ${
-                      selectedAnswer === index
-                        ? index === questions[currentQuestion].correctAnswer
-                          ? 'bg-[#5D8C48] border-[#E7E4DF]'
-                          : 'bg-[#857249] border-[#E7E4DF]'
-                        : 'bg-[#254942] border-[#857249] hover:border-[#E7E4DF]'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
-                        selectedAnswer === index
-                          ? index === questions[currentQuestion].correctAnswer
-                            ? 'bg-[#5D8C48] text-[#E7E4DF]'
-                            : 'bg-[#857249] text-[#E7E4DF]'
-                          : 'bg-[#857249] text-[#E7E4DF]'
-                      }`}>
-                        {index + 1}
-                      </div>
-                      <span className="text-[#E7E4DF]">{option}</span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-            
-            {showFeedback && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-[#857249] border-l-4 border-[#E7E4DF] p-4 mb-6 rounded"
-              >
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-[#E7E4DF]" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="mr-3">
-                    <p className="text-sm text-[#E7E4DF]">
-                      الإجابة الصحيحة هي: {questions[currentQuestion].options[questions[currentQuestion].correctAnswer]}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-            
-            <div className="text-center">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                disabled={!answered}
-                onClick={handleNextQuestion}
-                className={`px-6 py-3 rounded-full font-medium ${
-                  answered
-                    ? 'bg-[#857249] text-[#E7E4DF] shadow-md hover:bg-[#5D8C48]'
-                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+  // Render the checklist page
+  const renderChecklistPage = () => (
+    <div className="w-full">
+      <div className="mb-8 bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-semibold mb-4 flex items-center">
+          <Shield className="mr-2" size={24} />
+          Overall Security Score
+        </h2>
+        <div className="flex items-center mb-2">
+          <div className="w-full bg-gray-200 rounded-full h-4 mr-4">
+            <div 
+              className={`h-4 rounded-full ${getColorByPercentage(calculatePercentage(totalScore.score, totalScore.total))}`}
+              style={{ width: `${calculatePercentage(totalScore.score, totalScore.total)}%` }}
+            ></div>
+          </div>
+          <span className="text-xl font-bold">{Math.round(calculatePercentage(totalScore.score, totalScore.total))}%</span>
+        </div>
+        <div className="text-sm text-gray-600">
+          {totalScore.score} of {totalScore.total} items completed
+        </div>
+      </div>
+      
+      {/* Recommendations Section */}
+      <div className="mb-8 bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-semibold mb-4 flex items-center">
+          <Info className="mr-2" size={24} />
+          Recommendations
+        </h2>
+        <div>
+          {getRecommendations(sectionScores).length > 0 ? (
+            getRecommendations(sectionScores).map((rec, index) => (
+              <div 
+                key={index} 
+                className={`p-4 rounded-md mb-3 ${
+                  rec.severity === 'high' ? 'bg-red-100 border-l-4 border-red-500' : 
+                  rec.severity === 'medium' ? 'bg-yellow-100 border-l-4 border-yellow-500' : 
+                  'bg-green-100 border-l-4 border-green-500'
                 }`}
               >
-                {currentQuestion === questions.length - 1 ? 'إنهاء الاختبار' : 'السؤال التالي'}
-              </motion.button>
+                <h3 className="font-semibold">{rec.section}</h3>
+                <p>{rec.message}</p>
+              </div>
+            ))
+          ) : (
+            <div className="bg-green-100 border-l-4 border-green-500 p-4 rounded-md">
+              <p className="font-semibold">Excellent work!</p>
+              <p>Your AWS environment has passed all security checks. Continue with regular reviews to maintain this high standard.</p>
             </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#254942] rounded-lg shadow-lg p-8 text-center text-[#E7E4DF]"
+          )}
+        </div>
+      </div>
+      
+      {/* Checklist Sections */}
+      {securitySections.map(section => (
+        <div key={section.id} className="mb-6 bg-white rounded-lg shadow-md overflow-hidden">
+          <div 
+            className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer"
+            onClick={() => toggleSectionExpand(section.id)}
           >
-            <div className="mb-6">
-              <motion.div 
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="w-24 h-24 rounded-full bg-[#857249] mx-auto flex items-center justify-center"
+            <h3 className="text-xl font-semibold">{section.title}</h3>
+            <div className="flex items-center">
+              <div className="mr-4">
+                <span className="font-medium">
+                  {sectionScores[section.id]?.score || 0}/{sectionScores[section.id]?.total || 0}
+                </span>
+              </div>
+              <svg 
+                className={`w-5 h-5 transition-transform ${sectionsExpanded[section.id] ? 'transform rotate-180' : ''}`} 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
               >
-                <span className="text-3xl font-bold text-[#E7E4DF]">{score}</span>
-              </motion.div>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </div>
-            
-            <h2 className="text-2xl font-bold text-[#E7E4DF] mb-2">اكتمل الاختبار!</h2>
-            <p className="text-[#E7E4DF] mb-6">حصلت على {score} من أصل {questions.length * 2} نقاط</p>
-            
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+          </div>
+          
+          {sectionsExpanded[section.id] && (
+            <div className="p-4 border-t">
+              <div className="flex items-center mb-3">
+                <div className="w-full bg-gray-200 rounded-full h-2 mr-4">
+                  <div 
+                    className={`h-2 rounded-full ${getColorByPercentage(
+                      calculatePercentage(
+                        sectionScores[section.id]?.score || 0, 
+                        sectionScores[section.id]?.total || 1
+                      )
+                    )}`}
+                    style={{ 
+                      width: `${calculatePercentage(
+                        sectionScores[section.id]?.score || 0, 
+                        sectionScores[section.id]?.total || 1
+                      )}%` 
+                    }}
+                  ></div>
+                </div>
+                <span className="text-sm font-medium">
+                  {Math.round(calculatePercentage(
+                    sectionScores[section.id]?.score || 0, 
+                    sectionScores[section.id]?.total || 1
+                  ))}%
+                </span>
+              </div>
+              
+              <ul className="space-y-2">
+                {section.items.map(item => (
+                  <li key={item.id} className="flex items-start">
+                    <div 
+                      className={`flex-shrink-0 w-6 h-6 border rounded-md mr-3 cursor-pointer flex items-center justify-center ${
+                        checkedItems[item.id] ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                      }`}
+                      onClick={() => handleItemCheck(item.id)}
+                    >
+                      {checkedItems[item.id] && <Check size={16} className="text-white" />}
+                    </div>
+                    <span className="text-gray-800">{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+  
+  // Render the about page
+  const renderAboutPage = () => (
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <h2 className="text-2xl font-semibold mb-4 flex items-center">
+        <User className="mr-2" size={24} />
+        About Me
+      </h2>
+      
+      <div className="mb-6">
+        <p className="mb-4">
+          Hello! I'm Abdullah, a passionate cloud security professional specializing in AWS environments. 
+          This tool is designed to help AWS users evaluate and improve their cloud security posture 
+          through a comprehensive checklist of security best practices.
+        </p>
+        <p>
+          Feel free to use this checklist as a starting point for securing your AWS infrastructure. 
+          Remember that security is a continuous process that requires regular assessment and improvement.
+        </p>
+      </div>
+      
+      <h3 className="text-xl font-semibold mb-3">Connect with me</h3>
+      <div className="space-y-3">
+        <div className="flex items-center">
+          <Github size={20} className="mr-3" />
+          <a href="https://github.com/vm32" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+            @vm32
+          </a>
+        </div>
+        
+        <div className="flex items-center">
+          <Mail size={20} className="mr-3" />
+          <a href="mailto:abdullah@linux.com" className="text-blue-600 hover:underline">
+            abdullah@linux.com
+          </a>
+        </div>
+        
+        <div className="flex items-center">
+          <Linkedin size={20} className="mr-3" />
+          <a href="https://linkedin.com/in/abdullah1337" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+            @abdullah1337
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-center mb-2">AWS Cloud Security Checklist</h1>
+          <p className="text-center text-gray-600 mb-6">
+            Evaluate and improve your AWS environment security posture
+          </p>
+          
+          <nav className="flex border-b">
+            <button
+              className={`py-2 px-4 font-medium ${currentPage === 'checklist' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600 hover:text-gray-800'}`}
+              onClick={() => setCurrentPage('checklist')}
             >
-              {score >= (questions.length * 2 * 0.8) ? (
-                <div className="text-[#E7E4DF] mb-6">
-                  <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <p className="font-medium">أحسنت! لديك فهم ممتاز لسياسات الأمن والخصوصية.</p>
-                </div>
-              ) : score >= (questions.length * 2 * 0.6) ? (
-                <div className="text-[#E7E4DF] mb-6">
-                  <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-5a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm1-9a1 1 0 00-1 1v4a1 1 0 102 0V5a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  <p className="font-medium">جيد! يمكنك تحسين معرفتك بسياسات الأمن والخصوصية.</p>
-                </div>
-              ) : (
-                <div className="text-[#E7E4DF] mb-6">
-                  <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  <p className="font-medium">تحتاج إلى مراجعة سياسات الأمن والخصوصية بشكل أفضل.</p>
-                </div>
-              )}
-            </motion.div>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={restartQuiz}
-              className="px-6 py-3 bg-[#857249] text-[#E7E4DF] rounded-full font-medium shadow-md hover:bg-[#5D8C48]"
+              Checklist
+            </button>
+            <button
+              className={`py-2 px-4 font-medium ${currentPage === 'about' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600 hover:text-gray-800'}`}
+              onClick={() => setCurrentPage('about')}
             >
-              إعادة الاختبار
-            </motion.button>
-          </motion.div>
-        )}
+              About
+            </button>
+          </nav>
+        </header>
+        
+        <main>
+          {currentPage === 'checklist' ? renderChecklistPage() : renderAboutPage()}
+        </main>
+        
+        <footer className="mt-12 text-center text-gray-600 text-sm">
+          <p>AWS Cloud Security Checklist &copy; {new Date().getFullYear()}</p>
+        </footer>
       </div>
     </div>
   );
 };
 
-export default QuizApp;
+export default App;
